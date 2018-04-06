@@ -1,0 +1,11 @@
+{
+  "name": "frontend-hw-api",
+  "version": "1.0.0",
+  "description": "A simple json api for the Frontend coding project 001",
+  "main": "index.js",
+  "author": "Tyler Torola <tjtorola@hustle.life>",
+  "license": "MIT",
+  "dependencies": {
+    "json-server": "^0.12.1"
+  }
+}
