@@ -5,6 +5,9 @@
   "main": "index.js",
   "author": "Tyler Torola <tjtorola@hustle.life>",
   "license": "MIT",
+  "scripts": {
+    "start": "json-server --watch db.json"
+  },
   "dependencies": {
     "json-server": "^0.12.1"
   }
