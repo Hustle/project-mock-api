@@ -14,6 +14,8 @@ yarn start
 After running the command above you can then make a get request to `localhost:3000/people` for an index of all
 the people. Or `localhost:3000/people/${peopleId}` for an individual.
 
+You can also access `localhost:3000/me` for a good starting point person to open with.
+
 #### For the curious:
 
 This is built with [json-server](https://github.com/typicode/json-server) which exposes some extra endpoints that
