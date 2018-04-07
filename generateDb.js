@@ -47,9 +47,10 @@ const sample = iterable => () => iterable[Math.floor(Math.random() * iterable.le
 const randomId = () => Array(10).fill(null).map(sample(ID_CHARS)).join('');
 const randomFirstName = sample(FIRST_NAMES);
 const randomLastName = sample(LAST_NAMES);
-const randomPerson = (lastName) => () => ({
+const randomPerson = (lastName, parentIds = [ /* 😟 */ ]) => () => ({
   id: randomId(),
-  children: [],
+  parentIds,
+  childrenIds: [],
   firstName: randomFirstName(),
   lastName: lastName ||randomLastName()
 });
@@ -67,14 +68,15 @@ const randomFamily = (generationCount, generations = initialGenerations) => {
   const parentalPairs = Array(numParentalPairs).fill(null).map((_, idx) => [shuffledGen[idx * 2], shuffledGen[(idx * 2) + 1]]);
 
   const nextGeneration = parentalPairs.reduce((acc, parents) => {
+    const parentIds = parents.map(p => p.id);
     const familyName = sample(parents)().lastName;
     const childCount = Math.floor(Math.random() * MAX_CHILDREN) + 1;
 
-    const children = Array(childCount).fill(null).map(randomPerson(familyName));
+    const children = Array(childCount).fill(null).map(randomPerson(familyName, parentIds));
 
-    const childIds = children.map(c => c.id);
-    // Mutating here because its much easier
-    parents.forEach(p => { p.children = childIds; });
+    const childrenIds = children.map(c => c.id);
+    // Mutating here because something something life-altering effects of child-bearing
+    parents.forEach(p => { p.childrenIds = childrenIds; });
 
     return [...acc, ...children];
   }, []);
