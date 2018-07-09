@@ -1,5 +1,5 @@
 const MAX_CHILDREN = 5;
-const INITIAL_POPULATION = 20;
+const INITIAL_POPULATION = 8;
 const SEED_RATIO = .8;
 
 const ID_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -51,6 +51,7 @@ const randomPerson = (lastName, parentIds = [ /* 😟 */ ]) => () => ({
   id: randomId(),
   parentIds,
   childrenIds: [],
+  siblingIds: [],
   firstName: randomFirstName(),
   lastName: lastName ||randomLastName()
 });
@@ -61,11 +62,18 @@ const randomFamily = (generationCount, generations = initialGenerations) => {
   if (generations.length === generationCount) return flatten(generations);
   const [ curGeneration, ...oldGenerations ] = generations;
 
-  // Not checking for incest because it's complicated / not MVP
-  const shuffledGen = shuffle(curGeneration);
+  let incestious = true;
+  let parentalPairs;
+  while(incestious) {
+    const shuffledGen = shuffle(curGeneration);
 
-  const numParentalPairs = Math.floor(shuffledGen.length * SEED_RATIO / 2);
-  const parentalPairs = Array(numParentalPairs).fill(null).map((_, idx) => [shuffledGen[idx * 2], shuffledGen[(idx * 2) + 1]]);
+    const numParentalPairs = Math.floor(shuffledGen.length * SEED_RATIO / 2);
+    parentalPairs = Array(numParentalPairs).fill(null).map((_, idx) => [shuffledGen[idx * 2], shuffledGen[(idx * 2) + 1]]);
+    incestious = !parentalPairs.every(pair => pair[0].lastName !== pair[1].lastName);
+  }
+
+  console.log(`GENERATION ${generations.length + 1} PAIRS:`);
+  console.log(parentalPairs);
 
   const nextGeneration = parentalPairs.reduce((acc, parents) => {
     const parentIds = parents.map(p => p.id);
@@ -77,11 +85,19 @@ const randomFamily = (generationCount, generations = initialGenerations) => {
     const childrenIds = children.map(c => c.id);
     // Mutating here because something something life-altering effects of child-bearing
     parents.forEach(p => { p.childrenIds = childrenIds; });
+    children.forEach(c => {
+      const siblingIds = childrenIds.filter(i => i !== c.id);
+      c.siblingIds = siblingIds;
+    });
 
     return [...acc, ...children];
   }, []);
 
+  console.log(`GENERATION ${generations.length + 1}`);
+  console.log(nextGeneration);
   return randomFamily(generationCount, [nextGeneration, ...generations]);
 }
 
-console.log(JSON.stringify(randomFamily(10)));
+const family = randomFamily(4);
+console.log(JSON.stringify(family));
+console.log(family.length);
